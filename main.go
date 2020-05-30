@@ -88,5 +88,5 @@ func wawMix(fileIn1, fileIn2, fileOut string) error {
 }
 
 func main() {
-
+	ogg2wav("in.ogg", "out.wav")
 }
