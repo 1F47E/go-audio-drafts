@@ -6,3 +6,5 @@ github.com/go-audio/wav v1.0.0 h1:WdSGLhtyud6bof6XHL28xKeCQRzCV06pOFo3LZsFdyE=
 github.com/go-audio/wav v1.0.0/go.mod h1:3yoReyQOsiARkvPl3ERCi8JFjihzG6WhjYpZCf5zAWE=
 github.com/hraban/opus v0.0.0-20191117073431-57179dff69a6 h1:BP6pubwFUaHeUmTvPy1NotDzMJv73031oP9ZPMzRe1Q=
 github.com/hraban/opus v0.0.0-20191117073431-57179dff69a6/go.mod h1:YQQXrWHN3JEvCtw5ImyTCcPeU/ZLo/YMA+TpB64XdrU=
+github.com/viert/go-lame v0.0.0-20190822173615-801f1be8d24f h1:Nyjl5q+O34OmyQ8q/xUibfORaLDhBpmT8OU2nPUJQOU=
+github.com/viert/go-lame v0.0.0-20190822173615-801f1be8d24f/go.mod h1:EqTcYM7y4JlSfeTI47pmNu3EZQuCuLQefsQyg1Imlz8=

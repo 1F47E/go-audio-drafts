@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/go-audio/audio"
 	"io"
 	"os"
 	"github.com/hraban/opus"
 	"github.com/go-audio/wav"
+	"github.com/viert/go-lame"
 )
 
 var (
@@ -56,17 +58,12 @@ func ogg2wav(fileIn, fileOut string) {
 		}
 		pcm := oggBuffer[:cnt*numChannels]
 
-
-		// TODO write actual decoded data
 		for _, b := range pcm {
 			audioBuffer.Data = append(audioBuffer.Data, int(b))
 		}
-
-
 	}
 	fmt.Printf("audioBuffer len: %d\n", len(audioBuffer.Data))
 	// Write buffer to output file. This writes a RIFF header and the PCM chunks from the audio.IntBuffer.
-
 	if err := encoder_out.Write(&audioBuffer); err != nil {
 		check(err)
 	}
@@ -77,9 +74,43 @@ func ogg2wav(fileIn, fileOut string) {
 	fmt.Printf("encoder_out WrittenBytes: %d\n", encoder_out.WrittenBytes)
 }
 
-func wav2mp3(fileIn, fileOut string) error {
+func wav2mp3(fileIn, fileOut string) {
+	f_out, err := os.Create(fileOut)
+	check(err)
+	defer f_out.Close()
+	enc := lame.NewEncoder(f_out)
+	err = enc.SetNumChannels(1)
+	err = enc.SetQuality(5)
+	check(err)
+	defer enc.Close()
 
-	return nil
+	f_in, err := os.Open(fileIn)
+	check(err)
+	defer f_in.Close()
+
+	r := bufio.NewReader(f_in)
+	// simple way - just write whole file without modifications
+	//_, err = r.WriteTo(enc)
+
+	// but doing via Read because of a weird click at the beginning
+	buf := make([]byte, 1024)
+	bytesToSkip := 1024 * 5 // skip first glitch samples. 10 = 0.9sec?
+	var bytesRead int
+	for {
+		n, err := r.Read(buf)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+		bytesRead += n
+		if bytesRead < bytesToSkip {
+			continue
+		}
+		pcm := buf[:n]
+		_, err = enc.Write(pcm)
+		check(err)
+	}
 }
 
 func wawMix(fileIn1, fileIn2, fileOut string) error {
@@ -88,5 +119,21 @@ func wawMix(fileIn1, fileIn2, fileOut string) error {
 }
 
 func main() {
-	ogg2wav("in.ogg", "out.wav")
+	// os.Args[0] - path to binary
+	if len(os.Args) < 4 {
+		// TODO print help
+		fmt.Println("use: [ogg2wav,wav2mp3] file_in file_out")
+		os.Exit(0)
+	}
+	argsCommand := os.Args[1]
+	argsFileIn := os.Args[2]
+	argsFileOut := os.Args[3]
+	switch argsCommand {
+	case "ogg2wav":
+		ogg2wav(argsFileIn, argsFileOut)
+	case "wav2mp3":
+		wav2mp3(argsFileIn, argsFileOut)
+	default:
+		fmt.Printf("command %s not found", argsCommand)
+	}
 }
