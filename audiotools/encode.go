@@ -7,7 +7,6 @@ import (
 	"github.com/hraban/opus"
 	"github.com/viert/go-lame"
 	"io"
-	"io/ioutil"
 )
 
 var (
@@ -108,6 +107,3 @@ func WavToMp3(r io.Reader) ([]byte, error) {
 	return fb.Bytes(), nil
 }
 
-func BytesToFile(audioData []byte, filename string) error {
-	return ioutil.WriteFile(filename, audioData, 0755)
-}
